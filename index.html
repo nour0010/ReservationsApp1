@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#06111f"/>
+<title>حجوزات</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#06111f;min-height:100%;font-family:'Cairo',sans-serif;direction:rtl;color:#dde8f8;overflow-x:hidden}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:rgba(59,130,246,.2);border-radius:4px}
+input::placeholder{color:rgba(106,139,176,.4)}
+input[type=date]::-webkit-calendar-picker-indicator,
+input[type=time]::-webkit-calendar-picker-indicator{filter:invert(.55);cursor:pointer}
+input[type=number]::-webkit-inner-spin-button{opacity:.3}
+button{cursor:pointer;font-family:'Cairo',sans-serif;border:none;outline:none}
+
+@keyframes pageIn{from{opacity:0;transform:translateY(13px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideR{from{transform:translateX(260px)}to{transform:translateX(0)}}
+@keyframes popUp{from{opacity:0;transform:scale(.94) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+
+/* ── NAV ── */
+#nav{
+  position:fixed;top:0;left:0;right:0;z-index:500;height:56px;
+  background:rgba(4,12,24,.93);backdrop-filter:blur(26px);-webkit-backdrop-filter:blur(26px);
+  border-bottom:1px solid rgba(59,130,246,.13);
+  display:flex;align-items:center;gap:10px;padding:0 14px;
+}
+#back-btn{
+  width:33px;height:33px;border-radius:9px;
+  border:1px solid rgba(59,130,246,.2);background:rgba(59,130,246,.07);
+  color:#60a5fa;font-size:14px;
+  display:none;align-items:center;justify-content:center;flex-shrink:0;
+  transition:background .15s;
+}
+#back-btn:hover{background:rgba(59,130,246,.15)}
+#back-btn.show{display:flex}
+#logo{
+  font-family:'Amiri',serif;font-size:21px;font-weight:700;
+  color:#60a5fa;letter-spacing:3px;line-height:1;white-space:nowrap;user-select:none;
+}
+#logo small{
+  display:block;font-size:8px;color:#253a54;
+  letter-spacing:4px;font-family:'Cairo',sans-serif;text-align:center;margin-top:2px;
+}
+#sw{flex:1;display:flex;justify-content:center}
+#nav-s{
+  width:100%;max-width:290px;padding:7px 15px;border-radius:999px;
+  border:1px solid rgba(59,130,246,.18);background:rgba(11,23,40,.8);
+  color:#dde8f8;font-size:13px;font-family:'Cairo',sans-serif;outline:none;
+  transition:border-color .2s,box-shadow .2s;
+}
+#nav-s:focus{border-color:rgba(96,165,250,.5);box-shadow:0 0 0 3px rgba(59,130,246,.1)}
+#mbtn{
+  width:35px;height:35px;border-radius:9px;
+  border:1px solid rgba(59,130,246,.18);background:rgba(59,130,246,.07);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  flex-shrink:0;transition:background .15s;
+}
+#mbtn:hover{background:rgba(59,130,246,.14)}
+.bl{width:14px;height:1.5px;background:#60a5fa;border-radius:2px;pointer-events:none}
+
+/* ── SIDEBAR ── */
+#sbo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:600}
+#sbo.on{display:block;animation:fadeIn .2s ease both}
+#sb{
+  position:fixed;top:0;right:0;bottom:0;width:250px;z-index:700;
+  background:#091523;border-left:1px solid rgba(96,165,250,.16);
+  display:flex;flex-direction:column;
+  transform:translateX(110%);transition:transform .27s cubic-bezier(.4,0,.2,1);
+}
+#sb.on{transform:translateX(0)}
+.sbh{
+  padding:20px 20px 14px;border-bottom:1px solid rgba(59,130,246,.1);
+  font-family:'Amiri',serif;font-size:21px;color:#60a5fa;letter-spacing:3px;
+}
+.sbh small{
+  display:block;font-size:9px;color:#253a54;
+  letter-spacing:4px;font-family:'Cairo',sans-serif;margin-top:3px;
+}
+.sbi{
+  display:flex;align-items:center;gap:11px;padding:13px 20px;cursor:pointer;
+  color:#5a7fa0;font-size:14px;border-right:3px solid transparent;
+  transition:all .15s;text-decoration:none;
+}
+.sbi:hover{background:rgba(59,130,246,.08);color:#93c5fd}
+.sbi.act{background:rgba(59,130,246,.12);border-right:3px solid #3b82f6;color:#93c5fd;font-weight:700}
+.sbi .ic{font-size:15px}
+.sbsep{height:1px;background:rgba(59,130,246,.09);margin:5px 0}
+.sbst{
+  margin:13px;padding:14px 15px;border-radius:13px;
+  background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.15);
+}
+.sbst .sl{font-size:10px;color:#2d4266;font-weight:700;letter-spacing:1px;margin-bottom:6px}
+.sbst .sv{font-size:20px;font-weight:900;color:#f59e0b}
+.sbst .sd{font-size:11px;color:#2d4266;margin-top:3px}
+
+/* ── CONTENT ── */
+#app{max-width:850px;margin:0 auto;padding:70px 15px 52px}
+
+/* ── PAGES ── */
+.pg{display:none}
+.pg.on{display:block;animation:pageIn .33s cubic-bezier(.4,0,.2,1) both}
+
+/* ── STAT GRID ── */
+.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(116px,1fr));gap:10px;margin-bottom:20px}
+.sc{border-radius:13px;padding:13px 11px;text-align:center;border:1px solid rgba(255,255,255,.035)}
+.sv{font-size:18px;font-weight:900;line-height:1;margin-bottom:5px}
+.slb{font-size:11px;color:#6a8bb0;font-weight:600}
+
+/* ── BUTTONS ── */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:5px;
+  padding:10px 19px;border-radius:10px;font-weight:700;font-size:13px;
+  color:#fff;border:none;white-space:nowrap;
+  transition:filter .15s,transform .15s;
+}
+.btn:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.btn:active{transform:translateY(0)}
+.bp{background:#3b82f6}.bg{background:#22c55e}
+.bd{background:rgba(239,68,68,.22);color:#f87171}
+.bgh{background:rgba(59,130,246,.13);color:#93c5fd}
+.bfull{width:100%;padding:12px;font-size:15px}
+.brow{display:flex;gap:11px;flex-wrap:wrap;margin-bottom:24px}
+.brow .btn{flex:1;padding:13px;font-size:14px}
+.bsm{padding:5px 11px;border-radius:8px;font-size:12px;font-weight:600;background:rgba(59,130,246,.13);color:#93c5fd;border:none;transition:filter .15s}
+.bsm:hover{filter:brightness(1.15)}
+.bsmd{padding:5px 11px;border-radius:8px;font-size:12px;font-weight:600;background:rgba(239,68,68,.12);color:#f87171;border:none;transition:filter .15s}
+.bsmd:hover{filter:brightness(1.15)}
+
+/* ── HERO ── */
+.hero{text-align:center;padding:26px 0 24px}
+.ht{font-family:'Amiri',serif;font-size:50px;color:#60a5fa;line-height:1;letter-spacing:6px;margin-bottom:8px}
+.hs{font-size:11px;color:#253a54;letter-spacing:5px;font-weight:600}
+
+/* ── HEADERS ── */
+.ph{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:20px}
+.pt{font-family:'Amiri',serif;font-size:25px;color:#60a5fa;letter-spacing:1px}
+.slbl{font-size:11px;color:#253a54;font-weight:700;letter-spacing:2px;margin-bottom:11px}
+
+/* ── SHEET CARD ── */
+.shc{
+  background:rgba(255,255,255,.026);border:1px solid rgba(59,130,246,.11);
+  border-radius:14px;padding:15px 17px;margin-bottom:10px;cursor:pointer;
+  transition:border-color .2s,transform .2s,box-shadow .2s;
+}
+.shc:hover{border-color:rgba(96,165,250,.36);transform:translateX(-2px);box-shadow:0 8px 36px rgba(0,0,0,.44)}
+.sht{font-family:'Amiri',serif;font-size:17px;color:#dde8f8}
+.shm{color:#6a8bb0;font-size:12px;margin-top:4px}
+
+/* ── PATIENT ROW ── */
+.pr{
+  display:flex;align-items:flex-start;gap:10px;padding:13px 14px;
+  background:rgba(255,255,255,.02);border:1px solid rgba(59,130,246,.09);
+  border-radius:12px;margin-bottom:9px;flex-wrap:wrap;transition:background .15s;
+}
+.pr:hover{background:rgba(96,165,250,.04)}
+.pn{
+  width:31px;height:31px;border-radius:50%;
+  background:rgba(59,130,246,.13);border:1px solid rgba(59,130,246,.2);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:900;color:#60a5fa;font-size:12px;flex-shrink:0;
+}
+.pi{flex:1;min-width:148px}
+.pname{font-weight:700;font-size:15px}
+.pmeta{color:#6a8bb0;font-size:11px;margin-top:3px}
+.pnote{color:#3a6070;font-size:11px;margin-top:2px}
+.pm{text-align:center;min-width:110px}
+.pmt{font-weight:800;color:#fbbf24;font-size:14px}
+.pms{font-size:10px;color:#2d4266;margin-top:1px}
+.pa{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.bdg{
+  display:inline-flex;align-items:center;padding:4px 11px;border-radius:20px;
+  font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;border:none;transition:filter .15s;
+}
+.bdg:hover{filter:brightness(1.15)}
+.bp2{background:rgba(34,197,94,.12);color:#4ade80;outline:1px solid rgba(34,197,94,.24)}
+.bu{background:rgba(239,68,68,.12);color:#f87171;outline:1px solid rgba(239,68,68,.24)}
+
+/* ── INPUTS ── */
+.inp{
+  width:100%;padding:10px 13px;border-radius:10px;
+  border:1px solid rgba(59,130,246,.2);background:rgba(9,20,34,.9);
+  color:#dde8f8;font-size:14px;font-family:'Cairo',sans-serif;outline:none;
+  transition:border-color .2s,box-shadow .2s;
+}
+.inp:focus{border-color:rgba(96,165,250,.45);box-shadow:0 0 0 3px rgba(59,130,246,.08)}
+.lbl{font-size:11px;color:#5a7fa0;margin-bottom:5px;display:block;font-weight:700;letter-spacing:.4px}
+.fr{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.fc{flex:1;min-width:128px}
+
+/* ── TOTAL BOX ── */
+.totb{
+  background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.17);
+  border-radius:12px;padding:14px;text-align:center;margin-bottom:14px;
+}
+.totl{font-size:10px;color:#5a7fa0;font-weight:700;letter-spacing:1px;margin-bottom:5px}
+.totv{font-size:27px;font-weight:900;color:#60a5fa}
+
+/* ── CHECKBOX ── */
+.cr{display:flex;align-items:center;gap:9px;cursor:pointer;margin-bottom:21px;user-select:none}
+.cr input{width:16px;height:16px;accent-color:#22c55e}
+.cr span{color:#4ade80;font-weight:700;font-size:14px}
+
+/* ── MODAL ── */
+#mw{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.78);z-index:800;
+  align-items:center;justify-content:center;padding:15px;
+}
+#mw.on{display:flex;animation:fadeIn .2s ease both}
+.mb{
+  background:#091523;border:1px solid rgba(96,165,250,.23);
+  border-radius:20px;padding:26px;width:100%;max-width:520px;
+  max-height:92vh;overflow-y:auto;animation:popUp .27s cubic-bezier(.4,0,.2,1) both;
+}
+.mbsm{max-width:350px}
+.mh{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}
+.mtt{font-family:'Amiri',serif;font-size:20px;color:#60a5fa;letter-spacing:1px}
+
+/* ── MISC ── */
+.empty{text-align:center;padding:55px 20px;color:#2d4266;font-size:14px}
+.div{height:1px;background:rgba(59,130,246,.09);margin:5px 0}
+
+@media(max-width:500px){
+  .ht{font-size:38px}
+  #nav-s{max-width:150px;font-size:12px}
+  .pr{flex-direction:column}
+  .pm{min-width:unset;text-align:right}
+  .fr{flex-direction:column}
+  .mb{padding:18px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <button id="back-btn" onclick="goBack()">◀</button>
+  <div id="logo">حجوزات<small>CLINIC</small></div>
+  <div id="sw">
+    <input id="nav-s" class="inp" type="search" placeholder="🔍 بحث عن مراجع..."
+      oninput="onSearch(this.value)"
+      onfocus="if(V.cur!=='search') go('search')"/>
+  </div>
+  <button id="mbtn" onclick="openSB()">
+    <span class="bl"></span><span class="bl"></span><span class="bl"></span>
+  </button>
+</nav>
+
+<!-- SIDEBAR -->
+<div id="sbo" onclick="closeSB()"></div>
+<aside id="sb">
+  <div class="sbh">حجوزات<small>CLINIC SYSTEM</small></div>
+  <a class="sbi act" id="sbi-home"   href="#" onclick="go('home');  return false"><span class="ic">⊞</span> الرئيسية</a>
+  <a class="sbi"     id="sbi-sheets" href="#" onclick="go('sheets');return false"><span class="ic">◧</span> أوراق الحجوزات</a>
+  <a class="sbi"     id="sbi-search" href="#" onclick="go('search');return false"><span class="ic">◎</span> بحث عن مراجع</a>
+  <div class="sbsep"></div>
+  <a class="sbi" href="#" onclick="openAddSheet();closeSB();return false"><span class="ic">＋</span> ورقة جديدة</a>
+  <div style="flex:1"></div>
+  <div class="sbst">
+    <div class="sl">إجمالي اليوم المدفوع</div>
+    <div class="sv" id="sb-val"></div>
+    <div class="sd" id="sb-dt"></div>
+  </div>
+</aside>
+
+<!-- APP -->
+<main id="app">
+
+  <!-- HOME -->
+  <section class="pg on" id="pg-home">
+    <div class="hero">
+      <div class="ht">حجوزات</div>
+      <div class="hs">نظام إدارة مراجعي العيادة</div>
+    </div>
+    <div class="sg" id="h-stats"></div>
+    <div class="brow">
+      <button class="btn bp" onclick="openAddSheet()">＋ ورقة حجوزات جديدة</button>
+      <button class="btn bgh" onclick="go('sheets')">◧ كل الأوراق السابقة</button>
+    </div>
+    <div class="slbl">أحدث الأوراق</div>
+    <div id="h-recent"></div>
+  </section>
+
+  <!-- SHEETS -->
+  <section class="pg" id="pg-sheets">
+    <div class="ph">
+      <h2 class="pt">أوراق الحجوزات</h2>
+      <button class="btn bp" onclick="openAddSheet()">＋ ورقة جديدة</button>
+    </div>
+    <div id="sheets-list"></div>
+  </section>
+
+  <!-- SHEET DETAIL -->
+  <section class="pg" id="pg-sheet">
+    <div class="ph">
+      <h2 class="pt" id="sh-title"></h2>
+      <button class="btn bg" onclick="openAddPat()">＋ إضافة مراجع</button>
+    </div>
+    <div class="sg" id="sh-stats"></div>
+    <div id="sh-pats"></div>
+  </section>
+
+  <!-- SEARCH -->
+  <section class="pg" id="pg-search">
+    <div class="ph">
+      <h2 class="pt">بحث <span id="sq-lbl" style="font-size:14px;color:#3a5a70;font-weight:400"></span></h2>
+    </div>
+    <input id="s-inp" class="inp" style="margin-bottom:18px;font-size:15px;padding:12px 15px"
+      placeholder="اكتب اسم المراجع للبحث..." oninput="onSearch(this.value)"/>
+    <div id="s-res"></div>
+  </section>
+
+</main>
+
+<!-- MODAL -->
+<div id="mw" onclick="if(event.target===this)closeModal()">
+  <div class="mb" id="mi"></div>
+</div>
+
+<script>
+'use strict';
+
+/* ══ UTILS ══ */
+const $   = id => document.getElementById(id);
+const fmt = n  => (+n||0).toLocaleString('ar-IQ')+' د.ع';
+const uid = () => Math.random().toString(36).slice(2,9);
+const tod = () => new Date().toISOString().slice(0,10);
+const esc = s  => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+const sT  = s  => s.patients.reduce((a,p)=>a+p.bookingFee+p.opFee, 0);
+const sP  = s  => s.patients.filter(p=>p.paid).reduce((a,p)=>a+p.bookingFee+p.opFee, 0);
+
+/* ══ STATE ══ */
+const V = { cur:'home', prev:null, sid:null, epid:null, sq:'' };
+
+/* ══ DATA ══ */
+let DB = [];
+try { DB = JSON.parse(localStorage.getItem('hj_db'))||[]; } catch(e){}
+if(!DB.length) DB = [{
+  id:'s0', date:'2025-02-10', patients:[
+    {id:1,name:'أحمد محمد علي', age:35,weight:78,time:'09:00',bookingFee:20000,opFee:0,     paid:true, notes:''},
+    {id:2,name:'فاطمة حسن',    age:28,weight:62,time:'09:30',bookingFee:20000,opFee:150000,paid:false,notes:'عملية استئصال'},
+    {id:3,name:'كريم عبدالله', age:52,weight:90,time:'10:00',bookingFee:20000,opFee:0,     paid:true, notes:''},
+  ]
+}];
+
+function save(){ try{ localStorage.setItem('hj_db',JSON.stringify(DB)); }catch(e){} }
+
+/* ══ NAVIGATION ══ */
+function go(view, sid){
+  V.prev = V.cur;
+  V.cur  = view;
+  if(sid !== undefined) V.sid = sid;
+
+  document.querySelectorAll('.pg').forEach(p=>{ p.classList.remove('on'); });
+  const pg = $('pg-'+view);
+  if(pg){ pg.classList.remove('on'); void pg.offsetWidth; pg.classList.add('on'); }
+
+  $('back-btn').classList.toggle('show', view!=='home');
+
+  document.querySelectorAll('.sbi[id]').forEach(el=>el.classList.remove('act'));
+  const si = $('sbi-'+view);
+  if(si) si.classList.add('act');
+
+  closeSB();
+  render(view);
+}
+
+function goBack(){ go(V.prev && V.prev!==V.cur ? V.prev : 'home'); }
+
+/* ══ SIDEBAR ══ */
+function openSB(){
+  $('sb').classList.add('on');
+  $('sbo').classList.add('on');
+  updateStat();
+}
+function closeSB(){
+  $('sb').classList.remove('on');
+  $('sbo').classList.remove('on');
+}
+function updateStat(){
+  const td = tod();
+  const tm = DB.filter(s=>s.date===td).reduce((a,s)=>a+sP(s),0);
+  $('sb-val').textContent = fmt(tm);
+  $('sb-dt').textContent  = td;
+}
+
+/* ══ RENDER ══ */
+function render(v){
+  if(v==='home')   renderHome();
+  if(v==='sheets') renderSheets();
+  if(v==='sheet')  renderSheet();
+  if(v==='search') renderSearch();
+  updateStat();
+}
+
+function statC(val,lbl,c,bg){
+  return `<div class="sc" style="background:${bg}"><div class="sv" style="color:${c}">${val}</div><div class="slb">${lbl}</div></div>`;
+}
+
+function sheetCard(s){
+  return `<div class="shc" onclick="go('sheet','${esc(s.id)}')">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+      <div>
+        <div class="sht">ورقة بتاريخ ${esc(s.date)}</div>
+        <div class="shm">${s.patients.length} مراجع &nbsp;·&nbsp;
+          إجمالي: ${fmt(sT(s))} &nbsp;·&nbsp;
+          <span style="color:#4ade80">مدفوع: ${fmt(sP(s))}</span> &nbsp;·&nbsp;
+          <span style="color:#f87171">متبقي: ${fmt(sT(s)-sP(s))}</span>
+        </div>
+      </div>
+      <span style="color:#60a5fa;font-size:18px">◀</span>
+    </div>
+  </div>`;
+}
+
+function renderHome(){
+  const tdM = DB.filter(s=>s.date===tod()).reduce((a,s)=>a+sP(s),0);
+  $('h-stats').innerHTML =
+    statC(DB.length,                                  'ورقة حجوزات',    '#60a5fa','rgba(59,130,246,.09)')+
+    statC(DB.reduce((a,s)=>a+s.patients.length,0),    'إجمالي المراجعين','#4ade80','rgba(34,197,94,.09)') +
+    statC(fmt(DB.reduce((a,s)=>a+sP(s),0)),           'إجمالي المدفوع',  '#f59e0b','rgba(245,158,11,.09)')+
+    statC(fmt(tdM),                                    'مدفوع اليوم',     '#a78bfa','rgba(139,92,246,.09)');
+
+  $('h-recent').innerHTML = DB.slice(0,5).map(sheetCard).join('') ||
+    '<div class="empty">لا توجد أوراق حجوزات بعد</div>';
+}
+
+function renderSheets(){
+  $('sheets-list').innerHTML = DB.length ? DB.map(sheetCard).join('') :
+    '<div class="empty">لا توجد أوراق بعد</div>';
+}
+
+function renderSheet(){
+  const s = DB.find(x=>x.id===V.sid);
+  if(!s) return;
+  $('sh-title').textContent = 'ورقة '+s.date;
+  $('sh-stats').innerHTML =
+    statC(s.patients.length,          'مراجع',    '#60a5fa','rgba(59,130,246,.09)')+
+    statC(fmt(sT(s)),                 'الإجمالي', '#f59e0b','rgba(245,158,11,.09)')+
+    statC(fmt(sP(s)),                 'مدفوع',    '#4ade80','rgba(34,197,94,.09)') +
+    statC(fmt(sT(s)-sP(s)),           'متبقي',    '#f87171','rgba(239,68,68,.09)');
+
+  if(!s.patients.length){
+    $('sh-pats').innerHTML='<div class="empty">لا يوجد مراجعون — اضغط «إضافة مراجع»</div>';
+    return;
+  }
+  const sorted=[...s.patients].sort((a,b)=>(a.time||'').localeCompare(b.time||''));
+  $('sh-pats').innerHTML = sorted.map((p,i)=>`
+    <div class="pr">
+      <div class="pn">${i+1}</div>
+      <div class="pi">
+        <div class="pname">${esc(p.name)}</div>
+        <div class="pmeta">
+          ${p.time?'🕐 '+p.time+' ':''} ${p.age?'· '+p.age+' سنة ':''} ${p.weight?'· '+p.weight+' كغ':''}
+        </div>
+        ${p.notes?'<div class="pnote">📝 '+esc(p.notes)+'</div>':''}
+      </div>
+      <div class="pm">
+        <div class="pmt">${fmt(p.bookingFee+p.opFee)}</div>
+        <div class="pms">حجز: ${fmt(p.bookingFee)}</div>
+        <div class="pms">عملية: ${fmt(p.opFee)}</div>
+      </div>
+      <div class="pa">
+        <button class="bdg ${p.paid?'bp2':'bu'}" onclick="togglePaid('${esc(V.sid)}',${p.id})">
+          ${p.paid?'✓ مدفوع':'✗ لم يدفع'}
+        </button>
+        <button class="bsm" onclick="openEditPat(${p.id})">✏️</button>
+        <button class="bsmd" onclick="delPat(${p.id})">🗑</button>
+      </div>
+    </div>`).join('');
+}
+
+function renderSearch(){
+  $('s-inp').value = V.sq;
+  $('sq-lbl').textContent = V.sq ? '«'+V.sq+'»' : '';
+  if(!V.sq){ $('s-res').innerHTML='<div class="empty">اكتب اسم المراجع في مربع البحث</div>'; return; }
+  const q = V.sq.toLowerCase();
+  const res = DB.flatMap(s=>s.patients
+    .filter(p=>p.name.toLowerCase().includes(q)||(p.notes||'').toLowerCase().includes(q))
+    .map(p=>({...p,sd:s.date,si:s.id})));
+  if(!res.length){ $('s-res').innerHTML='<div class="empty">لا توجد نتائج مطابقة</div>'; return; }
+  $('s-res').innerHTML = res.map(p=>`
+    <div class="pr">
+      <div class="pi">
+        <div class="pname">${esc(p.name)}</div>
+        <div class="pmeta">📅 ${esc(p.sd)} ${p.time?'· 🕐 '+p.time:''} · ${p.age} سنة · ${p.weight} كغ</div>
+        ${p.notes?'<div class="pnote">📝 '+esc(p.notes)+'</div>':''}
+      </div>
+      <div style="text-align:center">
+        <div class="pmt">${fmt(p.bookingFee+p.opFee)}</div>
+        <span class="bdg ${p.paid?'bp2':'bu'}">${p.paid?'✓ مدفوع':'✗ لم يدفع'}</span>
+      </div>
+      <button class="bsm" onclick="go('sheet','${esc(p.si)}')">عرض ◀</button>
+    </div>`).join('');
+}
+
+function onSearch(val){
+  V.sq = val;
+  $('nav-s').value = val;
+  if(V.cur!=='search') go('search');
+  else renderSearch();
+}
+
+/* ══ MUTATIONS ══ */
+function togglePaid(sid,pid){
+  const s=DB.find(x=>x.id===sid);
+  const p=s.patients.find(x=>x.id===pid);
+  p.paid=!p.paid;
+  save(); render(V.cur);
+}
+function delPat(pid){
+  if(!confirm('هل تريد حذف هذا المراجع؟')) return;
+  const s=DB.find(x=>x.id===V.sid);
+  s.patients=s.patients.filter(p=>p.id!==pid);
+  save(); renderSheet(); updateStat();
+}
+
+/* ══ MODALS ══ */
+function showModal(html, small){
+  const mi=$('mi');
+  mi.className='mb'+(small?' mbsm':'');
+  mi.innerHTML=html;
+  $('mw').classList.add('on');
+}
+function closeModal(){
+  $('mw').classList.remove('on');
+  $('mi').innerHTML='';
+}
+
+/* ADD SHEET */
+function openAddSheet(){
+  showModal(`
+    <div class="mh">
+      <div class="mtt">ورقة حجوزات جديدة</div>
+      <button class="bsmd" onclick="closeModal()">✕</button>
+    </div>
+    <label class="lbl">تاريخ الورقة</label>
+    <input type="date" id="ns-d" class="inp" style="margin-bottom:18px" value="${tod()}"/>
+    <div style="display:flex;gap:10px">
+      <button class="btn bg" style="flex:1" onclick="doAddSheet()">إنشاء الورقة</button>
+      <button class="btn bd" style="flex:1" onclick="closeModal()">إلغاء</button>
+    </div>`, true);
+}
+function doAddSheet(){
+  const d=$('ns-d').value;
+  if(!d) return;
+  const id='sh-'+uid();
+  DB.unshift({id,date:d,patients:[]});
+  save(); closeModal(); go('sheet',id);
+}
+
+/* ADD / EDIT PATIENT */
+function openAddPat(){
+  V.epid=null;
+  patModal({name:'',age:'',weight:'',time:'',bookingFee:20000,opFee:0,paid:false,notes:''},'إضافة مراجع جديد');
+}
+function openEditPat(pid){
+  const s=DB.find(x=>x.id===V.sid);
+  const p=s.patients.find(x=>x.id===pid);
+  V.epid=pid;
+  patModal({...p},'تعديل بيانات المراجع');
+}
+
+function patModal(d,title){
+  showModal(`
+    <div class="mh">
+      <div class="mtt">${title}</div>
+      <button class="bsmd" onclick="closeModal()">✕</button>
+    </div>
+    <div class="fr">
+      <div class="fc">
+        <label class="lbl">الاسم الكامل</label>
+        <input id="pf-n" class="inp" value="${esc(d.name)}" placeholder="اسم المراجع" oninput="calcTotal()"/>
+      </div>
+      <div class="fc">
+        <label class="lbl">وقت الموعد</label>
+        <input type="time" id="pf-t" class="inp" value="${esc(d.time)}"/>
+      </div>
+    </div>
+    <div class="fr">
+      <div class="fc">
+        <label class="lbl">العمر (سنة)</label>
+        <input type="number" id="pf-a" class="inp" value="${d.age||''}" placeholder="0"/>
+      </div>
+      <div class="fc">
+        <label class="lbl">الوزن (كغ)</label>
+        <input type="number" id="pf-w" class="inp" value="${d.weight||''}" placeholder="0"/>
+      </div>
+    </div>
+    <div class="fr">
+      <div class="fc">
+        <label class="lbl">سعر الحجز (د.ع)</label>
+        <input type="number" id="pf-b" class="inp" value="${d.bookingFee||20000}" oninput="calcTotal()"/>
+      </div>
+      <div class="fc">
+        <label class="lbl">سعر العملية (د.ع)</label>
+        <input type="number" id="pf-o" class="inp" value="${d.opFee||0}" oninput="calcTotal()"/>
+      </div>
+    </div>
+    <div class="totb">
+      <div class="totl">المبلغ الإجمالي</div>
+      <div class="totv" id="pf-tot">${fmt((+d.bookingFee||0)+(+d.opFee||0))}</div>
+    </div>
+    <div style="margin-bottom:13px">
+      <label class="lbl">ملاحظات</label>
+      <input id="pf-nt" class="inp" value="${esc(d.notes)}" placeholder="اختياري..."/>
+    </div>
+    <label class="cr">
+      <input type="checkbox" id="pf-p" ${d.paid?'checked':''}/>
+      <span>تم الدفع ✓</span>
+    </label>
+    <button class="btn bg bfull" onclick="doSavePat()">حفظ المراجع</button>
+  `);
+}
+
+function calcTotal(){
+  const b=+($('pf-b')?.value)||0;
+  const o=+($('pf-o')?.value)||0;
+  const el=$('pf-tot');
+  if(el) el.textContent=fmt(b+o);
+}
+
+function doSavePat(){
+  const name=($('pf-n').value||'').trim();
+  if(!name){alert('يرجى إدخال اسم المراجع');return;}
+  const pat={
+    name,
+    time:      $('pf-t').value||'',
+    age:       +$('pf-a').value||0,
+    weight:    +$('pf-w').value||0,
+    bookingFee:+$('pf-b').value||0,
+    opFee:     +$('pf-o').value||0,
+    paid:       $('pf-p').checked,
+    notes:     ($('pf-nt').value||'').trim(),
+  };
+  const s=DB.find(x=>x.id===V.sid);
+  if(V.epid){
+    const idx=s.patients.findIndex(p=>p.id===V.epid);
+    s.patients[idx]={...s.patients[idx],...pat};
+  } else {
+    pat.id=Date.now();
+    s.patients.push(pat);
+  }
+  save(); closeModal(); renderSheet(); updateStat();
+}
+
+/* ══ INIT ══ */
+updateStat();
+$('sb-dt').textContent=tod();
+renderHome();
+</script>
+</body>
+</html>
