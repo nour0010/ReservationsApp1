@@ -500,6 +500,34 @@ svg{display:inline-block;flex-shrink:0}
 .empty svg{width:40px;height:40px;opacity:.25;margin-bottom:10px;display:block;margin-inline:auto}
 .divr{height:1px;background:var(--border);margin:5px 0}
 
+/* language buttons */
+.lang-btn{
+  padding:6px 14px;border-radius:8px;font-size:12px;font-weight:700;
+  background:rgba(59,130,246,.08);color:var(--text2);
+  border:1px solid var(--border);cursor:pointer;font-family:var(--font);
+  transition:all .15s;
+}
+.lang-btn:hover{background:rgba(59,130,246,.15);color:var(--accent2)}
+.lang-btn.lang-active{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+/* nav extra items — visible on desktop, hidden on mobile */
+#nav-extra{
+  display:none;align-items:center;gap:2px;
+}
+@media(min-width:700px){
+  #nav-extra{display:flex}
+  #nav-s{max-width:200px}
+}
+.nav-extra-btn{
+  display:flex;align-items:center;gap:5px;padding:6px 10px;
+  border-radius:8px;font-size:12px;font-weight:600;color:var(--text2);
+  background:none;border:none;cursor:pointer;font-family:var(--font);
+  transition:all .15s;white-space:nowrap;
+}
+.nav-extra-btn:hover{background:rgba(59,130,246,.1);color:var(--accent2)}
+.nav-extra-btn.act{background:rgba(59,130,246,.12);color:var(--accent2)}
+.nav-extra-btn svg{width:14px;height:14px}
+
 /* ═══════════════════════════════════════
    RESPONSIVE
 ═══════════════════════════════════════ */
@@ -589,6 +617,15 @@ svg{display:inline-block;flex-shrink:0}
     </div>
   </div>
   <div id="sdot" title="حالة المزامنة"></div>
+  <!-- desktop extra nav items -->
+  <div id="nav-extra">
+    <button class="nav-extra-btn" id="neb-backup" onclick="go('backup')">
+      <svg><use href="#i-cloud"/></svg><span id="neb-backup-txt">النسخ</span>
+    </button>
+    <button class="nav-extra-btn" id="neb-settings" onclick="go('settings')">
+      <svg><use href="#i-gear"/></svg><span id="neb-settings-txt">الإعدادات</span>
+    </button>
+  </div>
   <div id="nav-user" onclick="openSB()" title="الحساب">
     <div class="nu-txt" id="nav-user-inner">
       <svg style="width:16px;height:16px"><use href="#i-user"/></svg>
@@ -732,14 +769,15 @@ svg{display:inline-block;flex-shrink:0}
 
   <!-- SETTINGS -->
   <section class="pg" id="pg-settings">
-    <div class="ph"><h2 class="pt"><svg><use href="#i-gear"/></svg> الإعدادات</h2></div>
+    <div class="ph"><h2 class="pt"><svg><use href="#i-gear"/></svg> <span id="set-title-txt">الإعدادات</span></h2></div>
 
+    <!-- Appearance -->
     <div class="set-card">
-      <div class="set-title"><svg><use href="#i-sun"/></svg> المظهر</div>
+      <div class="set-title" id="set-appearance-title"><svg><use href="#i-sun"/></svg> المظهر</div>
       <div class="set-row">
         <div>
-          <div class="set-lbl">الوضع الفاتح</div>
-          <div class="set-desc">تبديل بين الوضع الداكن والفاتح</div>
+          <div class="set-lbl" id="set-lbl-light">الوضع الفاتح</div>
+          <div class="set-desc" id="set-desc-light">تبديل بين الوضع الداكن والفاتح</div>
         </div>
         <label class="toggle">
           <input type="checkbox" id="tog-light" onchange="toggleTheme(this.checked)"/>
@@ -748,28 +786,58 @@ svg{display:inline-block;flex-shrink:0}
       </div>
     </div>
 
+    <!-- Language -->
     <div class="set-card">
-      <div class="set-title"><svg><use href="#i-font"/></svg> الخط</div>
-      <div class="font-grid" id="font-grid">
-        <div class="font-opt sel" style="font-family:'Cairo'"    onclick="setFont('Cairo',this)">Cairo — كايرو</div>
-        <div class="font-opt"     style="font-family:'Amiri'"    onclick="setFont('Amiri',this)">Amiri — أميري</div>
-        <div class="font-opt"     style="font-family:'Tajawal'"  onclick="setFont('Tajawal',this)">Tajawal — تجوال</div>
-        <div class="font-opt"     style="font-family:'Almarai'"  onclick="setFont('Almarai',this)">Almarai — المراعي</div>
+      <div class="set-title"><svg><use href="#i-notes"/></svg> <span id="set-lang-title">اللغة</span></div>
+      <div class="set-row">
+        <div>
+          <div class="set-lbl" id="set-lbl-lang">اللغة</div>
+          <div class="set-desc" id="set-desc-lang">تغيير لغة واجهة التطبيق</div>
+        </div>
+        <div style="display:flex;gap:6px">
+          <button id="lang-ar-btn" class="lang-btn lang-active" onclick="setLang('ar')">العربية</button>
+          <button id="lang-en-btn" class="lang-btn" onclick="setLang('en')">English</button>
+        </div>
       </div>
     </div>
 
+    <!-- Font -->
     <div class="set-card">
-      <div class="set-title"><svg><use href="#i-money"/></svg> الأسعار الافتراضية</div>
+      <div class="set-title" id="set-font-title"><svg><use href="#i-font"/></svg> الخط</div>
+      <div class="font-grid" id="font-grid">
+        <div class="font-opt sel" style="font-family:'Cairo'"   onclick="setFont('Cairo',this)">Cairo — كايرو</div>
+        <div class="font-opt"    style="font-family:'Amiri'"   onclick="setFont('Amiri',this)">Amiri — أميري</div>
+        <div class="font-opt"    style="font-family:'Tajawal'" onclick="setFont('Tajawal',this)">Tajawal — تجوال</div>
+        <div class="font-opt"    style="font-family:'Almarai'" onclick="setFont('Almarai',this)">Almarai — المراعي</div>
+      </div>
+    </div>
+
+    <!-- Prices -->
+    <div class="set-card">
+      <div class="set-title" id="set-prices-title"><svg><use href="#i-money"/></svg> الأسعار الافتراضية</div>
       <div class="fr" style="margin-bottom:0">
         <div class="fc">
-          <label class="lbl">سعر الحجز (د.ع)</label>
+          <label class="lbl" id="lbl-booking-def">سعر الحجز (د.ع)</label>
           <input type="number" id="def-booking" class="inp" value="20000" oninput="saveDef()"/>
         </div>
         <div class="fc">
-          <label class="lbl">سعر العملية (د.ع)</label>
+          <label class="lbl" id="lbl-op-def">سعر العملية (د.ع)</label>
           <input type="number" id="def-op" class="inp" value="0" oninput="saveDef()"/>
         </div>
       </div>
+    </div>
+
+    <!-- Danger Zone -->
+    <div class="set-card" style="border-color:rgba(239,68,68,.22)">
+      <div class="set-title" style="color:#f87171" id="set-danger-title">
+        <svg><use href="#i-warning"/></svg> <span>منطقة الخطر</span>
+      </div>
+      <div class="set-desc" style="margin-bottom:14px;color:var(--text2)" id="set-danger-desc">
+        حذف كافة البيانات المحلية نهائياً — لا يمكن التراجع
+      </div>
+      <button class="btn bd" onclick="confirmClearAll()" id="set-delete-btn">
+        <svg><use href="#i-trash"/></svg> <span>حذف كل البيانات</span>
+      </button>
     </div>
 
   </section>
@@ -828,7 +896,7 @@ function toast(msg, type='ok', iconId=''){
 const V={cur:'home',prev:null,sid:null,epid:null,sq:''};
 
 /* ═══ SETTINGS ═══ */
-let CFG={theme:'dark',font:'Cairo',defBooking:20000,defOp:0};
+let CFG={theme:'dark',font:'Cairo',defBooking:20000,defOp:0,lang:'ar'};
 try{const c=JSON.parse(localStorage.getItem('hj_cfg')||'{}');Object.assign(CFG,c);}catch(e){}
 function saveCFG(){localStorage.setItem('hj_cfg',JSON.stringify(CFG));}
 
@@ -856,6 +924,126 @@ function saveDef(){
   saveCFG();
 }
 
+/* ═══ i18n ═══ */
+const LANG={
+  ar:{
+    appName:'حجوزات',appSub:'نظام إدارة مراجعي العيادة',clinicSub:'CLINIC SYSTEM',
+    home:'الرئيسية',sheets:'أوراق الحجوزات',search:'بحث عن مراجع',backup:'النسخ الاحتياطي',settings:'الإعدادات',
+    newSheet:'ورقة جديدة',allSheets:'كل الأوراق',logout:'تسجيل الخروج',
+    todayPaid:'إجمالي اليوم المدفوع',
+    searchPh:'بحث عن مراجع...',searchPh2:'اكتب اسم المراجع للبحث...',
+    loginTitle:'سجّل دخولك بحساب',loginDesc:'لحفظ بياناتك تلقائياً في',loginDesc2:'الخاص بك — آمن وخاص بك فقط',
+    loginBtn:'تسجيل الدخول بـ Google',loginSkip:'متابعة بدون تسجيل دخول',loginNote:'بياناتك محفوظة في Drive الخاص بك فقط — لا يمكن لأحد غيرك الوصول إليها',
+    addSheet:'إضافة مراجع جديد',editSheet:'تعديل بيانات المراجع',
+    sheetOf:'ورقة بتاريخ',patients:'مراجع',total:'الإجمالي',paid:'مدفوع',remaining:'متبقي',
+    totalSheets:'ورقة حجوزات',totalPatients:'المراجعين',totalPaid:'إجمالي المدفوع',todayPaidStat:'مدفوع اليوم',
+    noSheets:'لا توجد أوراق حجوزات بعد',noPatients:'لا يوجد مراجعون — اضغط «إضافة مراجع»',noSearch:'اكتب اسم المراجع للبحث',noResults:'لا توجد نتائج مطابقة',
+    export:'تصدير',addPatient:'مراجع',
+    fullName:'الاسم الكامل',namePh:'اسم المراجع',time:'وقت الموعد',age:'العمر (سنة)',weight:'الوزن (كغ)',
+    bookingFee:'سعر الحجز (د.ع)',opFee:'سعر العملية (د.ع)',totalAmt:'المبلغ الإجمالي',notes:'ملاحظات',notesPh:'اختياري...',paid2:'تم الدفع',save:'حفظ المراجع',
+    set_appearance:'المظهر',set_lightMode:'الوضع الفاتح',set_lightDesc:'تبديل بين الوضع الداكن والفاتح',
+    set_font:'الخط',set_prices:'الأسعار الافتراضية',set_bookingDef:'سعر الحجز (د.ع)',set_opDef:'سعر العملية (د.ع)',
+    set_lang:'اللغة',set_langDesc:'تغيير لغة واجهة التطبيق',
+    set_danger:'منطقة الخطر',set_dangerDesc:'حذف كافة البيانات المحلية نهائياً — لا يمكن التراجع',set_deleteBtn:'حذف كل البيانات',
+    set_confirmClear:'تأكيد الحذف النهائي',set_confirmClearDesc:'هذا الإجراء سيحذف جميع البيانات المحلية نهائياً ولا يمكن التراجع عنه.',
+    set_confirmClearBtn:'نعم، احذف كل شيء',set_cancel:'إلغاء',
+    driveSync:'Google Drive — مزامنة تلقائية',driveSyncDesc:'تُحفظ بياناتك تلقائياً عند أي تغيير وعند عودة الاتصال.',
+    syncNow:'مزامنة الآن',restore:'استعادة',
+    exportData:'تصدير البيانات',exportDesc:'تصدير بياناتك بصيغ مختلفة أو استيراد نسخة سابقة.',
+    importJSON:'استيراد JSON',
+    dangerZone:'منطقة الخطر',dangerDesc:'حذف كافة البيانات المحلية نهائياً — لا يمكن التراجع.',
+    notLoggedIn:'غير مسجّل الدخول',noInternet:'غير متصل — المزامنة معلّقة',connectedTo:'متصل بـ Drive · ',
+    lastSync:'آخر مزامنة: ',noSyncYet:'لم تتم مزامنة بعد',
+    recentSheets:'أحدث الأوراق',
+    year:'سنة',kg:'كغ',booking:'حجز',op:'عملية',status:'الحالة',paidStatus:'مدفوع',unpaidStatus:'لم يدفع',noteLabel:'ملاحظة',
+    editBtn:'تعديل',deleteBtn:'حذف',viewBtn:'عرض',
+    exportSheet:'تصدير الورقة',exportPDF:'تصدير PDF',exportExcel:'تصدير Excel',exportCSV:'تصدير CSV',
+    pdfAll:'PDF كامل',xlsAll:'Excel كامل',csvAll:'CSV كامل',
+    createSheet:'ورقة حجوزات جديدة',sheetDate:'تاريخ الورقة',createBtn:'إنشاء الورقة',
+    confirmDelete:'هل تريد حذف هذا المراجع؟',
+    syncMsg:'جاري المزامنة...',syncOk:'تم الحفظ في Google Drive',syncErr:'فشلت المزامنة: ',
+    onlineMsg:'تم الاتصال بالإنترنت',offlineMsg:'انقطع الاتصال',pendingMsg:'لا اتصال — سيتم الحفظ عند الاتصال',
+    noDataDrive:'لا توجد بيانات في Drive',sessionEnd:'انتهت جلسة Google',
+    restoredMsg:'تم استعادة ',sheetsWord:' ورقة',
+    importedMsg:'تم استيراد ',badFormat:'تنسيق غير صحيح',importConfirm:'سيتم استبدال كل البيانات بـ ',andSheets:' ورقة. هل أنت متأكد؟',
+    exportedJSON:'تم تصدير JSON',exportedPDF:'تم تصدير PDF',exportedExcel:'تم تصدير Excel',exportedCSV:'تم تصدير CSV',
+    exportedPDFAll:'تم تصدير PDF الكامل',exportedExcelAll:'تم تصدير Excel الكامل',
+    deletedAll:'تم حذف كل البيانات',
+    demoMode:'وضع تجريبي — Drive غير متصل',
+    logoutConfirm:'تسجيل الخروج؟',
+    dir:'rtl',lang:'ar',
+  },
+  en:{
+    appName:'Hujuzat',appSub:'Clinic Patient Management',clinicSub:'CLINIC SYSTEM',
+    home:'Home',sheets:'Booking Sheets',search:'Search Patient',backup:'Backup',settings:'Settings',
+    newSheet:'New Sheet',allSheets:'All Sheets',logout:'Sign Out',
+    todayPaid:"Today's Revenue",
+    searchPh:'Search patient...',searchPh2:'Type patient name to search...',
+    loginTitle:'Sign in with',loginDesc:'to auto-save your data to',loginDesc2:'— Secure and private',
+    loginBtn:'Sign in with Google',loginSkip:'Continue without signing in',loginNote:'Your data is saved only in your own Drive — no one else can access it',
+    addSheet:'Add New Patient',editSheet:'Edit Patient Info',
+    sheetOf:'Sheet dated',patients:'Patients',total:'Total',paid:'Paid',remaining:'Remaining',
+    totalSheets:'Sheets',totalPatients:'Patients',totalPaid:'Total Paid',todayPaidStat:"Today's Paid",
+    noSheets:'No booking sheets yet',noPatients:'No patients — tap «Add Patient»',noSearch:'Type a patient name to search',noResults:'No matching results',
+    export:'Export',addPatient:'Patient',
+    fullName:'Full Name',namePh:'Patient name',time:'Appointment Time',age:'Age (years)',weight:'Weight (kg)',
+    bookingFee:'Booking Fee (IQD)',opFee:'Operation Fee (IQD)',totalAmt:'Total Amount',notes:'Notes',notesPh:'Optional...',paid2:'Paid',save:'Save Patient',
+    set_appearance:'Appearance',set_lightMode:'Light Mode',set_lightDesc:'Switch between dark and light mode',
+    set_font:'Font',set_prices:'Default Prices',set_bookingDef:'Default Booking Fee (IQD)',set_opDef:'Default Op Fee (IQD)',
+    set_lang:'Language',set_langDesc:'Change the app interface language',
+    set_danger:'Danger Zone',set_dangerDesc:'Permanently delete all local data — cannot be undone',set_deleteBtn:'Delete All Data',
+    set_confirmClear:'Confirm Permanent Delete',set_confirmClearDesc:'This action will permanently delete all local data and cannot be undone.',
+    set_confirmClearBtn:'Yes, delete everything',set_cancel:'Cancel',
+    driveSync:'Google Drive — Auto Sync',driveSyncDesc:'Data is saved automatically on every change and when internet reconnects.',
+    syncNow:'Sync Now',restore:'Restore',
+    exportData:'Export Data',exportDesc:'Export your data in different formats or import a previous backup.',
+    importJSON:'Import JSON',
+    dangerZone:'Danger Zone',dangerDesc:'Permanently delete all local data — cannot be undone.',
+    notLoggedIn:'Not signed in',noInternet:'Offline — sync pending',connectedTo:'Connected to Drive · ',
+    lastSync:'Last sync: ',noSyncYet:'Not synced yet',
+    recentSheets:'Recent Sheets',
+    year:'y',kg:'kg',booking:'Booking',op:'Op',status:'Status',paidStatus:'Paid',unpaidStatus:'Unpaid',noteLabel:'Note',
+    editBtn:'Edit',deleteBtn:'Delete',viewBtn:'View',
+    exportSheet:'Export Sheet',exportPDF:'Export PDF',exportExcel:'Export Excel',exportCSV:'Export CSV',
+    pdfAll:'Full PDF',xlsAll:'Full Excel',csvAll:'Full CSV',
+    createSheet:'New Booking Sheet',sheetDate:'Sheet Date',createBtn:'Create Sheet',
+    confirmDelete:'Delete this patient?',
+    syncMsg:'Syncing...',syncOk:'Saved to Google Drive',syncErr:'Sync failed: ',
+    onlineMsg:'Back online',offlineMsg:'Connection lost',pendingMsg:'No connection — will sync when online',
+    noDataDrive:'No backup found in Drive',sessionEnd:'Google session expired',
+    restoredMsg:'Restored ',sheetsWord:' sheets',
+    importedMsg:'Imported ',badFormat:'Invalid format',importConfirm:'This will replace all data with ',andSheets:' sheets. Are you sure?',
+    exportedJSON:'JSON exported',exportedPDF:'PDF exported',exportedExcel:'Excel exported',exportedCSV:'CSV exported',
+    exportedPDFAll:'Full PDF exported',exportedExcelAll:'Full Excel exported',
+    deletedAll:'All data deleted',
+    demoMode:'Demo mode — Drive not connected',
+    logoutConfirm:'Sign out?',
+    dir:'ltr',lang:'en',
+  }
+};
+function t(k){return (LANG[CFG.lang||'ar']||LANG.ar)[k]||k;}
+function applyLang(){
+  const L=LANG[CFG.lang||'ar']||LANG.ar;
+  document.documentElement.lang=L.lang;
+  document.documentElement.dir=L.dir;
+  // nav
+  $('nav-s').placeholder=L.searchPh;
+  // sidebar items
+  const sm={home:L.home,sheets:L.sheets,search:L.search,backup:L.backup,settings:L.settings};
+  Object.entries(sm).forEach(([k,v])=>{const el=$('sbi-'+k);if(el){const svg=el.querySelector('svg');el.innerHTML='';if(svg)el.appendChild(svg);el.appendChild(document.createTextNode(' '+v);}});
+  // logo
+  const logo=$('logo');if(logo)logo.childNodes[0].textContent=L.appName;
+  // sidebar stat label
+  const sl=document.querySelector('.sbst .sl');if(sl){const svg=sl.querySelector('svg');sl.innerHTML='';if(svg)sl.appendChild(svg);sl.appendChild(document.createTextNode(' '+L.todayPaid));}
+  // re-render current page
+  if(V.cur) render(V.cur);
+}
+function setLang(lang){
+  CFG.lang=lang;saveCFG();
+  applyLang();
+  applySettings();
+}
+
 /* ═══ DATA ═══ */
 let DB=[];
 try{DB=JSON.parse(localStorage.getItem('hj_db'))||[];}catch(e){}
@@ -874,7 +1062,7 @@ const GD={
      ضع هنا Client ID بعد إنشائه من
      console.cloud.google.com
   ───────────────────────────────────────── */
-  clientId:'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com',
+  clientId:'213490399348-vqtb9psmtl351o8v04s40u3unaaca7ie.apps.googleusercontent.com',
   scope:'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile',
   token:null,user:null,fileId:null,
   fileName:'hujuzat_clinic_data.json',pending:false,
@@ -1073,7 +1261,7 @@ function go(view,sid){
   $('back-btn').classList.toggle('show',view!=='home');
   document.querySelectorAll('.sbi[id]').forEach(el=>el.classList.remove('act'));
   const si=$('sbi-'+view);if(si)si.classList.add('act');
-  closeSB();render(view);
+  closeSB();render(view);updateNavExtra();
 }
 function goBack(){go(V.prev&&V.prev!==V.cur?V.prev:'home');}
 
@@ -1218,7 +1406,59 @@ function renderSearch(){
 }
 
 function renderBackupPage(){updateBackupUI();}
-function renderSettingsPage(){applySettings();}
+function renderSettingsPage(){
+  applySettings();
+  // update all settings text with current lang
+  const L=LANG[CFG.lang||'ar']||LANG.ar;
+  const set=(id,txt)=>{const el=$(id);if(el)el.textContent=txt;};
+  set('set-title-txt',L.settings);
+  set('set-appearance-title',null);// handled by innerHTML below
+  const at=$('set-appearance-title');if(at){const s=at.querySelector('svg');at.innerHTML='';if(s)at.appendChild(s);at.appendChild(document.createTextNode(' '+L.set_appearance));}
+  set('set-lbl-light',L.set_lightMode);set('set-desc-light',L.set_lightDesc);
+  set('set-lang-title',L.set_lang);set('set-lbl-lang',L.set_lang);set('set-desc-lang',L.set_langDesc);
+  set('set-font-title',null);
+  const ft=$('set-font-title');if(ft){const s=ft.querySelector('svg');ft.innerHTML='';if(s)ft.appendChild(s);ft.appendChild(document.createTextNode(' '+L.set_font));}
+  set('set-prices-title',null);
+  const pt=$('set-prices-title');if(pt){const s=pt.querySelector('svg');pt.innerHTML='';if(s)pt.appendChild(s);pt.appendChild(document.createTextNode(' '+L.set_prices));}
+  set('lbl-booking-def',L.set_bookingDef);set('lbl-op-def',L.set_opDef);
+  const dt=$('set-danger-title');if(dt){const s=dt.querySelector('svg');dt.innerHTML='';if(s)dt.appendChild(s);const sp=document.createElement('span');sp.textContent=' '+L.set_danger;dt.appendChild(sp);}
+  set('set-danger-desc',L.set_dangerDesc);
+  const db=$('set-delete-btn');if(db){const s=db.querySelector('svg');const sp=db.querySelector('span');if(sp)sp.textContent=' '+L.set_deleteBtn;}
+  // lang buttons
+  const la=$('lang-ar-btn'),le=$('lang-en-btn');
+  if(la)la.classList.toggle('lang-active',CFG.lang==='ar');
+  if(le)le.classList.toggle('lang-active',CFG.lang==='en');
+  // nav extra
+  const nb=$('neb-backup-txt'),ns=$('neb-settings-txt');
+  if(nb)nb.textContent=L.backup;if(ns)ns.textContent=L.settings;
+  // update nav extra active state
+  updateNavExtra();
+}
+
+function confirmClearAll(){
+  const L=LANG[CFG.lang||'ar']||LANG.ar;
+  showModal(`
+    <div class="mh">
+      <div class="mtt" style="color:#f87171">${ico('i-warning')} ${L.set_confirmClear}</div>
+      <button class="bsmd" onclick="closeModal()">${ico('i-x')}</button>
+    </div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:20px;line-height:1.8;padding:14px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.18);border-radius:10px">
+      ${ico('i-warning')} ${L.set_confirmClearDesc}
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn bd bfull" onclick="doConfirmClear()">${ico('i-trash')} ${L.set_confirmClearBtn}</button>
+      <button class="btn bgh bfull" onclick="closeModal()">${ico('i-x')} ${L.set_cancel}</button>
+    </div>`,true);
+}
+function doConfirmClear(){
+  DB=[];localStorage.removeItem('hj_db');localStorage.removeItem('hj_last_sync');
+  closeModal();render(V.cur);toast(t('deletedAll'),'inf');
+}
+
+function updateNavExtra(){
+  document.querySelectorAll('.nav-extra-btn').forEach(b=>b.classList.remove('act'));
+  const nb=$('neb-'+V.cur);if(nb)nb.classList.add('act');
+}
 
 function onSearch(val){
   V.sq=val;$('nav-s').value=val;
@@ -1431,12 +1671,7 @@ function importJSON(e){
   };
   reader.readAsText(file);
 }
-function clearAll(){
-  if(!confirm('سيتم حذف كل البيانات نهائياً!\nهل أنت متأكد؟'))return;
-  if(!confirm('تأكيد أخير — لا يمكن التراجع!'))return;
-  DB=[];localStorage.removeItem('hj_db');localStorage.removeItem('hj_last_sync');
-  render(V.cur);toast('تم حذف كل البيانات','inf');
-}
+function clearAll(){confirmClearAll();}
 function dlText(text,name,mime){
   const blob=new Blob(['\uFEFF'+text],{type:mime+';charset=utf-8'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);
@@ -1445,11 +1680,11 @@ function dlText(text,name,mime){
 
 /* ═══ INIT ═══ */
 function initApp(){
-  applySettings();updateUserUI();updateStat();
+  applySettings();applyLang();updateUserUI();updateStat();
   $('sb-dt').textContent=tod();
   renderHome();
   if(GD.token&&GD.token!=='demo')setSyncDot('ok');
-  updateBackupUI();
+  updateBackupUI();updateNavExtra();
 }
 
 if(GD.token){$('login-screen').classList.add('hidden');initApp();}
