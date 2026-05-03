@@ -1918,8 +1918,10 @@ button {
   .ht {
     font-size: 36px;
   }
+  .search-wrap {
+    max-width: 140px;
+  }
   #nav-s {
-    max-width: 130px;
     font-size: 12px;
     padding: 6px 10px 6px 28px;
   }
