@@ -113,6 +113,8 @@ var TR = {
     pdfAll: 'PDF كامل',
     xlsAll: 'Excel كامل',
     csvAll: 'CSV كامل',
+    importExcel: 'استيراد من Excel',
+    importCSV: 'استيراد من CSV',
     dangerTitle: 'منطقة الخطر',
     dangerDesc: 'حذف كافة البيانات المحلية نهائياً.',
     delBtn: 'حذف كل البيانات',
@@ -227,6 +229,8 @@ var TR = {
     pdfAll: 'Full PDF',
     xlsAll: 'Full Excel',
     csvAll: 'Full CSV',
+    importExcel: 'Import Excel',
+    importCSV: 'Import CSV',
     dangerTitle: 'Danger Zone',
     dangerDesc: 'Permanently delete all local data.',
     delBtn: 'Delete All Data',
@@ -395,6 +399,7 @@ function applyLang() {
   st('exp-pdf-txt', L.pdfAll);
   st('exp-xls-txt', L.xlsAll);
   st('exp-csv-txt', L.csvAll);
+  st('bk-import-xls-btn', L.importExcel);
   st('set-appear-title', L.appearTitle);
   st('set-light-lbl', L.lightLbl);
   st('set-light-desc', L.lightDesc);
@@ -442,44 +447,7 @@ var DB = [];
 try {
   DB = JSON.parse(localStorage.getItem('hj_db')) || [];
 } catch (e) {}
-if (!DB.length) DB = [{
-  id: 's0',
-  date: '2025-02-10',
-  patients: [{
-      id: 1,
-      name: 'أحمد محمد علي',
-      age: 35,
-      weight: 78,
-      time: '09:00',
-      bookingFee: 20000,
-      opFee: 0,
-      paid: true,
-      notes: ''
-    },
-    {
-      id: 2,
-      name: 'فاطمة حسن',
-      age: 28,
-      weight: 62,
-      time: '09:30',
-      bookingFee: 20000,
-      opFee: 150000,
-      paid: false,
-      notes: 'عملية استئصال'
-    },
-    {
-      id: 3,
-      name: 'كريم عبدالله',
-      age: 52,
-      weight: 90,
-      time: '10:00',
-      bookingFee: 20000,
-      opFee: 0,
-      paid: true,
-      notes: ''
-    }
-  ]
-}];
+// Removed default data sheet.
 
 function saveLocal() {
   try {
@@ -641,6 +609,11 @@ function updateUserUI() {
     sr.classList.remove('show');
     $('sb-out').classList.remove('show');
   }
+  // show/hide inline login buttons
+  var lb = $('sb-login-btn');
+  if (lb) lb.style.display = has ? 'none' : 'flex';
+  var nlb = $('nav-login-btn');
+  if (nlb) nlb.style.display = has ? 'none' : 'flex';
 }
 
 function setSyncDot(st) {
@@ -984,7 +957,7 @@ function renderSheet() {
     if (p.age) meta += '· ' + p.age + ' ' + t('year') + ' ';
     if (p.weight) meta += '· ' + p.weight + ' ' + t('kg');
     return '<div class="pr-wrap">' +
-      '<div class="pr">' +
+      '<div class="pr" onclick="toggleDetail(' + p.id + ')">' +
       '<div class="pn">' + (i + 1) + '</div>' +
       '<div class="pi">' +
       '<div class="pname">' + esc(p.name) + '</div>' +
@@ -993,10 +966,10 @@ function renderSheet() {
       '</div>' +
       '<div class="pright">' +
       '<div class="pmt">' + fmt(p.bookingFee + p.opFee) + '</div>' +
-      '<button class="bdg ' + (p.paid ? 'bp2' : 'bu') + '" onclick="togglePaid(\'' + esc(V.sid) + '\',' + p.id + ')">' +
+      '<button class="bdg ' + (p.paid ? 'bp2' : 'bu') + '" onclick="event.stopPropagation(); togglePaid(\'' + esc(V.sid) + '\',' + p.id + ')">' +
       ico(p.paid ? 'I-check' : 'I-x', 9) + ' ' + (p.paid ? t('paidStatus') : t('unpaidStatus')) +
       '</button>' +
-      '<button class="pr-toggle" id="pt-' + p.id + '" onclick="toggleDetail(' + p.id + ')"><svg style="width:11px;height:11px"><use href="#I-chev"/></svg></button>' +
+      '<button class="pr-toggle" id="pt-' + p.id + '" onclick="event.stopPropagation(); toggleDetail(' + p.id + ')"><svg style="width:11px;height:11px"><use href="#I-chev"/></svg></button>' +
       '</div>' +
       '</div>' +
       '<div class="pr-detail" id="pd-' + p.id + '">' +
@@ -1044,7 +1017,7 @@ function renderSearch() {
   }
   $('s-res').innerHTML = res.map(function(r) {
     var p = r.p;
-    return '<div class="pr-wrap"><div class="pr">' +
+    return '<div class="pr-wrap"><div class="pr" onclick="go(\'sheet\',\'' + esc(r.si) + '\')">' +
       '<div class="pi">' +
       '<div class="pname">' + esc(p.name) + '</div>' +
       '<div class="pmeta">' + ico('I-cal', 10) + ' ' + esc(r.sd) + ' ' + (p.time ? ico('I-clock', 10) + p.time : '') + '</div>' +
@@ -1053,7 +1026,7 @@ function renderSearch() {
       '<div class="pright">' +
       '<div class="pmt">' + fmt(p.bookingFee + p.opFee) + '</div>' +
       '<span class="bdg ' + (p.paid ? 'bp2' : 'bu') + '">' + (p.paid ? t('paidStatus') : t('unpaidStatus')) + '</span>' +
-      '<button class="bsm" onclick="go(\'sheet\',\'' + esc(r.si) + '\')">' + ico('I-back', 12) + '</button>' +
+      '<button class="bsm" onclick="event.stopPropagation(); go(\'sheet\',\'' + esc(r.si) + '\')">' + ico('I-back', 12) + '</button>' +
       '</div>' +
       '</div></div>';
   }).join('');
@@ -1268,7 +1241,8 @@ function openExportSheet() {
 
 function buildRows(s) {
   return s.patients.map(function(p, i) {
-    return [i + 1, p.name, p.time || '—', p.age || 0, p.weight || 0, p.bookingFee || 0, p.opFee || 0, (p.bookingFee || 0) + (p.opFee || 0), p.paid ? t('paidStatus') : t('unpaidStatus'), p.notes || '—'];
+    var status = p.paid ? 'Paid' : 'Unpaid';
+    return [i + 1, p.name, p.time || '—', p.age || 0, p.weight || 0, p.bookingFee || 0, p.opFee || 0, (p.bookingFee || 0) + (p.opFee || 0), status, p.notes || '—'];
   });
 }
 
@@ -1286,7 +1260,7 @@ function exportSheetPDF() {
     doc.setFontSize(16);
     doc.text('Sheet: ' + s.date, 14, 14);
     doc.setFontSize(10);
-    doc.text('Total: ' + fmt(sT(s)) + '  Paid: ' + fmt(sP(s)), 14, 22);
+    doc.text('Total Revenue: ' + (sT(s)).toLocaleString() + ' IQD  |  Paid: ' + (sP(s)).toLocaleString() + ' IQD', 14, 22);
     doc.autoTable({
       startY: 27,
       head: [
@@ -1444,6 +1418,95 @@ function importJSON(e) {
   reader.readAsText(file);
 }
 
+function importExcel(e) {
+  var file = e.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      var data = new Uint8Array(ev.target.result);
+      var wb = XLSX.read(data, {
+        type: 'array'
+      });
+      var importedSheets = 0;
+      wb.SheetNames.forEach(function(sn) {
+        var rows = XLSX.utils.sheet_to_json(wb.Sheets[sn]);
+        if (rows.length) {
+          // try to parse date from sheet name
+          var date = sn.match(/\d{4}-\d{2}-\d{2}/) ? sn.match(/\d{4}-\d{2}-\d{2}/)[0] : tod();
+          var patients = rows.map(function(r) {
+            return {
+              id: Date.now() + Math.random(),
+              name: r['الاسم'] || r['الاسم الكامل'] || r['Name'] || r['Full Name'] || Object.values(r)[1] || 'بدون اسم',
+              time: r['الوقت'] || r['وقت'] || r['Time'] || '',
+              age: +r['العمر'] || +r['Age'] || 0,
+              weight: +r['الوزن'] || +r['Weight'] || 0,
+              bookingFee: +r['سعر الحجز'] || +r['Booking'] || 0,
+              opFee: +r['سعر العملية'] || +r['Op'] || 0,
+              paid: (r['الحالة'] || r['Status'] || '').toString().includes('مدفوع') || (r['Paid'] || '').toString().toLowerCase() === 'true',
+              notes: r['ملاحظات'] || r['Notes'] || ''
+            };
+          });
+          DB.push({
+            id: 'sh-' + uid(),
+            date: date,
+            patients: patients
+          });
+          importedSheets++;
+        }
+      });
+      if (importedSheets) {
+        save();
+        render(V.cur);
+        toast(t('importedMsg') + importedSheets + t('sheetsWord'));
+      }
+    } catch (err) {
+      toast(t('badFormat'), 'err');
+    }
+    e.target.value = '';
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function importCSV(e) {
+  var file = e.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      var text = ev.target.result;
+      var lines = text.split('\n').filter(l => l.trim());
+      if (lines.length < 2) return;
+      var patients = lines.slice(1).map(function(line) {
+        var cols = line.split(',').map(c => c.replace(/^"|"$/g, '').trim());
+        return {
+          id: Date.now() + Math.random(),
+          name: cols[1] || 'بدون اسم',
+          time: cols[2] || '',
+          age: +cols[3] || 0,
+          weight: +cols[4] || 0,
+          bookingFee: +cols[5] || 0,
+          opFee: +cols[6] || 0,
+          paid: cols[8] === 'Paid' || cols[8] === 'مدفوع',
+          notes: cols[9] || ''
+        };
+      });
+      DB.push({
+        id: 'sh-' + uid(),
+        date: tod(),
+        patients: patients
+      });
+      save();
+      render(V.cur);
+      toast(t('importedMsg') + ' 1 ' + t('sheetsWord'));
+    } catch (err) {
+      toast(t('badFormat'), 'err');
+    }
+    e.target.value = '';
+  };
+  reader.readAsText(file);
+}
+
 function dlText(text, name, mime) {
   var blob = new Blob(['\uFEFF' + text], {
     type: mime + ';charset=utf-8'
@@ -1465,9 +1528,46 @@ function initApp() {
   if (GD.token && GD.token !== 'demo') setSyncDot('ok');
   updateBackupUI();
   updateNavExtra();
+  if (window.matchMedia('(display-mode: standalone)').matches) {
+    hideInstallUI();
+  }
 }
 
 if (GD.token) {
   $('login-screen').classList.add('hidden');
   initApp();
 }
+
+/* ══ PWA INSTALL ══ */
+var deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  // Show install buttons
+  var ib = $('sb-install-btn');
+  if (ib) ib.style.display = 'flex';
+  var ip = $('install-prompt');
+  if (ip) ip.style.display = 'flex';
+});
+
+async function installApp() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  if (outcome === 'accepted') {
+    deferredPrompt = null;
+    hideInstallUI();
+  }
+}
+
+function hideInstallUI() {
+  var ib = $('sb-install-btn');
+  if (ib) ib.style.display = 'none';
+  var ip = $('install-prompt');
+  if (ip) ip.style.display = 'none';
+}
+
+window.addEventListener('appinstalled', (evt) => {
+  hideInstallUI();
+  toast('تم تثبيت التطبيق بنجاح');
+});

@@ -20,6 +20,9 @@
   
   <!-- Custom CSS -->
   <link rel="stylesheet" href="css/style.css">
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
 </head>
 
 <body>
@@ -70,6 +73,12 @@
       </button>
       <button class="skip-btn" onclick="skipLogin()" id="skip-btn-txt">متابعة بدون تسجيل دخول</button>
       <div class="ln"><svg style="width:12px;height:12px;vertical-align:middle"><use href="#I-lock"/></svg> بياناتك محفوظة في Drive الخاص بك فقط</div>
+      
+      <!-- Installation Prompt Icon -->
+      <div id="install-prompt" class="install-p" onclick="installApp()" style="display:none">
+        <svg style="width:18px;height:18px"><use href="#I-dl"/></svg>
+        <span>ثبّت التطبيق على هاتفك الآن</span>
+      </div>
     </div>
   </div>
 
@@ -88,6 +97,7 @@
       <button class="neb" id="neb-backup" onclick="go('backup')"><svg><use href="#I-cloud"/></svg><span id="neb-bk-txt">النسخ</span></button>
       <button class="neb" id="neb-settings" onclick="go('settings')"><svg><use href="#I-gear"/></svg><span id="neb-st-txt">الإعدادات</span></button>
     </div>
+    <button id="nav-login-btn" onclick="startGoogleLogin()" style="display:none;font-size:12px;margin:0 5px"><svg style="width:14px;height:14px"><use href="#I-user"/></svg> <span>تسجيل الدخول</span></button>
     <div id="nav-user" onclick="openSB()">
       <div class="nu-txt" id="nav-user-txt"><svg style="width:15px;height:15px"><use href="#I-user"/></svg></div>
     </div>
@@ -104,6 +114,7 @@
         <div class="sb-uname" id="sb-uname"></div>
         <div class="sb-uemail" id="sb-uemail"></div>
         <div class="sb-usync" id="sb-usync"></div>
+        <button id="sb-login-btn" onclick="startGoogleLogin()" style="display:none;margin-top:10px;font-size:12px;padding:8px 16px"><svg style="width:14px;height:14px"><use href="#I-user"/></svg> <span>تسجيل الدخول</span></button>
       </div>
     </div>
     <a class="sbi act" id="sbi-home" href="#" onclick="go('home');   return false"><svg><use href="#I-home"/></svg> <span class="sbi-txt" data-key="home">الرئيسية</span></a>
@@ -112,6 +123,9 @@
     <a class="sbi" id="sbi-backup" href="#" onclick="go('backup'); return false"><svg><use href="#I-cloud"/></svg> <span class="sbi-txt" data-key="backup">النسخ الاحتياطي</span></a>
     <a class="sbi" id="sbi-settings" href="#" onclick="go('settings');return false"><svg><use href="#I-gear"/></svg> <span class="sbi-txt" data-key="settings">الإعدادات</span></a>
     <div class="sbsep"></div>
+    <a class="sbi sbi-install" id="sb-install-btn" href="#" onclick="installApp();return false" style="display:none">
+      <svg><use href="#I-dl"/></svg> <span class="sbi-txt">تثبيت البرنامج</span>
+    </a>
     <a class="sbi" href="#" onclick="openAddSheet();closeSB();return false"><svg><use href="#I-plus"/></svg> <span class="sbi-txt" data-key="newSheet">ورقة جديدة</span></a>
     <div style="flex:1"></div>
     <div class="sb-out" id="sb-out" onclick="logout()"><svg><use href="#I-logout"/></svg> <span id="sb-logout-txt">تسجيل الخروج</span></div>
@@ -186,18 +200,27 @@
         <div style="font-size:11px;color:var(--text3);margin-top:9px" id="last-sync-lbl"></div>
       </div>
       <div class="bk-card">
-        <div class="bk-title"><svg><use href="#I-dl"/></svg> <span id="bk-export-title">تصدير البيانات</span></div>
-        <div class="bk-desc" id="bk-export-desc">تصدير بياناتك بصيغ مختلفة أو استيراد نسخة سابقة.</div>
-        <div class="bk-row">
-          <button class="btn bg2" onclick="exportJSON()"><svg><use href="#I-dl"/></svg> JSON</button>
-          <button class="btn bgh" onclick="document.getElementById('file-inp').click()"><svg><use href="#I-ul"/></svg> <span id="bk-import-btn">استيراد JSON</span></button>
+        <div class="bk-title"><svg><use href="#I-dl"/></svg> <span id="bk-export-title">تصدير واستيراد البيانات</span></div>
+        <div class="bk-desc" id="bk-export-desc">قم بإدارة بياناتك يدوياً عبر التصدير أو الاستيراد من ملفات خارجية.</div>
+        
+        <div class="bk-section-lbl">استيراد بيانات (رفع ملفات)</div>
+        <div class="bk-grid">
+          <button class="bk-tool t-json" onclick="document.getElementById('file-inp').click()"><svg><use href="#I-ul"/></svg> <span>JSON</span></button>
+          <button class="bk-tool t-xls" onclick="document.getElementById('xls-inp').click()"><svg><use href="#I-table"/></svg> <span>Excel</span></button>
+          <button class="bk-tool t-csv" onclick="document.getElementById('csv-inp').click()"><svg><use href="#I-note"/></svg> <span>CSV</span></button>
         </div>
-        <div class="exp-row">
-          <button class="exp-btn exp-pdf" onclick="exportAllPDF()"><svg><use href="#I-pdf"/></svg> <span id="exp-pdf-txt">PDF كامل</span></button>
-          <button class="exp-btn exp-xls" onclick="exportAllExcel()"><svg><use href="#I-table"/></svg> <span id="exp-xls-txt">Excel كامل</span></button>
-          <button class="exp-btn exp-csv" onclick="exportAllCSV()"><svg><use href="#I-note"/></svg> <span id="exp-csv-txt">CSV كامل</span></button>
+
+        <div class="bk-section-lbl" style="margin-top:16px">تصدير بيانات (حفظ ملفات)</div>
+        <div class="bk-grid">
+          <button class="bk-tool t-json" onclick="exportJSON()"><svg><use href="#I-dl"/></svg> <span>JSON</span></button>
+          <button class="bk-tool t-pdf" onclick="exportAllPDF()"><svg><use href="#I-pdf"/></svg> <span>PDF</span></button>
+          <button class="bk-tool t-xls" onclick="exportAllExcel()"><svg><use href="#I-table"/></svg> <span>Excel</span></button>
+          <button class="bk-tool t-csv" onclick="exportAllCSV()"><svg><use href="#I-note"/></svg> <span>CSV</span></button>
         </div>
+
         <input type="file" id="file-inp" accept=".json" style="display:none" onchange="importJSON(event)" />
+        <input type="file" id="xls-inp" accept=".xlsx,.xls" style="display:none" onchange="importExcel(event)" />
+        <input type="file" id="csv-inp" accept=".csv" style="display:none" onchange="importCSV(event)" />
       </div>
       <div class="bk-card" style="border-color:rgba(239,68,68,.2)">
         <div class="bk-title" style="color:#f87171"><svg><use href="#I-warn"/></svg> <span id="bk-danger-title">منطقة الخطر</span></div>
@@ -269,6 +292,17 @@
 
   <!-- Custom JS -->
   <script src="js/app.js"></script>
+
+  <!-- PWA Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(reg => console.log('SW Registered'))
+          .catch(err => console.log('SW Failed', err));
+      });
+    }
+  </script>
 </body>
 
 </html>
