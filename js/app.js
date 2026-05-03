@@ -610,6 +610,8 @@ function updateUserUI() {
     $('sb-out').classList.remove('show');
   }
   // show/hide inline login buttons
+  var sla = $('sb-login-area');
+  if (sla) sla.style.display = has ? 'none' : 'block';
   var lb = $('sb-login-btn');
   if (lb) lb.style.display = has ? 'none' : 'flex';
   var nlb = $('nav-login-btn');

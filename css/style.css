@@ -474,7 +474,7 @@ button {
 #nav-login-btn, #sb-login-btn {
   background: var(--accent);
   color: #fff;
-  border-radius: 999px; /* Pill/Circular shape */
+  border-radius: 999px;
   padding: 6px 12px;
   font-weight: 700;
   display: flex;
@@ -496,19 +496,30 @@ button {
   letter-spacing: 0;
 }
 
-#nav-login-btn span {
-  display: inline; /* Show the professional text */
-  margin-right: 4px;
+.sb-login-area {
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+  display: none;
 }
 
-#nav-login-btn:hover, #sb-login-btn:hover {
+#sb-login-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+  font-size: 13px;
+}
+
+#sb-login-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.35);
   filter: brightness(1.1);
-  transform: translateY(-1px);
 }
 
 /* Responsive Login Button Logic */
 @media (min-width: 701px) {
-  #sb-login-btn {
+  #sb-login-btn, .sb-login-area {
     display: none !important;
   }
 }
